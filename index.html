@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="description" content="Villa Harmony — კერძო ვილა ჩაქვში. Private villa in Chakvi, Georgia.">
+  <title>Villa Harmony | ჩაქვი</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Raleway:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
+    :root {
+      --bg:          #070707;
+      --surface:     #0D0D0D;
+      --surface-2:   #131313;
+      --wood:        #2A1005;
+      --wood-mid:    #3D1A08;
+      --navy:        #0A1E3A;
+      --navy-light:  #142B52;
+      --gold:        #C9A96E;
+      --gold-dim:    #8A7045;
+      --gold-light:  #E8D5A3;
+      --text:        #F2ECE3;
+      --text-muted:  #7A7060;
+      --border:      rgba(201,169,110,0.12);
+      --border-mid:  rgba(201,169,110,0.25);
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; font-size:16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display:block; max-width:100%; }
+    a { text-decoration:none; color:inherit; }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 900;
+      padding: 28px 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: padding .4s ease, background .4s ease, border .4s ease;
+    }
+    #nav.scrolled {
+      padding: 16px 64px;
+      background: rgba(7,7,7,0.96);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 20px;
+      font-weight: 300;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .nav-logo span { color: var(--gold); }
+
+    .nav-center {
+      display: flex;
+      gap: 44px;
+      list-style: none;
+    }
+    .nav-center a {
+      font-size: 10px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color .3s;
+    }
+    .nav-center a:hover { color: var(--gold); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .lang-group {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .lang-btn {
+      background: none;
+      border: none;
+      font-family: 'Raleway', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 6px;
+      transition: color .25s;
+      text-transform: uppercase;
+    }
+    .lang-btn.active { color: var(--gold); border-bottom: 1px solid var(--gold); }
+    .lang-sep { color: var(--text-muted); font-size: 9px; opacity: .4; }
+
+    .nav-cta {
+      font-family: 'Raleway', sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--border-mid);
+      padding: 10px 26px;
+      transition: all .3s;
+    }
+    .nav-cta:hover {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+    }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 26px;
+      height: 1px;
+      background: var(--gold);
+      transition: all .3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile drawer */
+    #mobile-drawer {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 800;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 36px;
+      transform: translateX(100%);
+      transition: transform .5s cubic-bezier(.77,0,.18,1);
+    }
+    #mobile-drawer.open { transform: translateX(0); }
+    #mobile-drawer a {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 40px;
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: var(--text);
+      transition: color .3s;
+    }
+    #mobile-drawer a:hover { color: var(--gold); }
+    .mobile-lang {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .mobile-lang .lang-btn { font-size: 12px; padding: 6px 10px; }
+    .mobile-phone {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 24px;
+      font-weight: 300;
+      color: var(--gold);
+      letter-spacing: 2px;
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    #hero {
+      position: relative;
+      height: 100vh;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #canvas-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        radial-gradient(ellipse at center, transparent 30%, rgba(7,7,7,0.6) 100%),
+        linear-gradient(to bottom, rgba(7,7,7,0.25) 0%, rgba(7,7,7,0) 40%, rgba(7,7,7,0.7) 80%, var(--bg) 100%);
+    }
+
+    .hero-body {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--border-mid);
+      padding: 8px 20px;
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .hero-h1 {
+      font-family: 'Cormorant Garant', serif;
+      font-size: clamp(72px, 12vw, 160px);
+      font-weight: 300;
+      line-height: .88;
+      letter-spacing: -3px;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .hero-h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      margin-top: 36px;
+      font-size: 11px;
+      letter-spacing: 7px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .hero-actions {
+      margin-top: 60px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .btn-gold {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--bg);
+      font-family: 'Raleway', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding: 16px 52px;
+      transition: background .3s;
+    }
+    .btn-gold:hover { background: var(--gold-light); }
+
+    .btn-ghost {
+      display: inline-block;
+      background: transparent;
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding: 16px 52px;
+      border: 1px solid rgba(242,236,227,.25);
+      transition: all .3s;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Scroll indicator */
+    .hero-scroll-ind {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+    }
+    .hero-scroll-ind .si-line {
+      width: 1px;
+      height: 56px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: siPulse 2.2s ease-in-out infinite;
+    }
+    .hero-scroll-ind .si-text {
+      font-size: 8px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      writing-mode: vertical-rl;
+    }
+    @keyframes siPulse {
+      0%,100%{ opacity:.3; } 50%{ opacity:1; }
+    }
+
+    /* ============================================================
+       SHARED SECTION STYLES
+    ============================================================ */
+    .section-pad { padding: 130px 0; }
+    .section-pad-sm { padding: 100px 0; }
+    .container { max-width: 1360px; margin: 0 auto; padding: 0 64px; }
+
+    .s-label {
+      font-size: 9px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      display: block;
+    }
+    .s-title {
+      font-family: 'Cormorant Garant', serif;
+      font-size: clamp(42px, 5.5vw, 80px);
+      font-weight: 300;
+      line-height: 1;
+      color: var(--text);
+    }
+    .s-title em { font-style: italic; color: var(--gold); }
+
+    .ornament {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 20px 0 0;
+    }
+    .ornament-line { flex: 1; height: 1px; background: var(--border-mid); }
+    .ornament-diamond { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); }
+
+    /* Reveal states (GSAP targets) */
+    .rv { opacity: 0; transform: translateY(44px); }
+    .rv-left { opacity: 0; transform: translateX(-50px); }
+    .rv-right { opacity: 0; transform: translateX(50px); }
+
+    /* ============================================================
+       VILLA SECTION
+    ============================================================ */
+    #villa { background: var(--bg); }
+
+    .villa-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 96px;
+      align-items: center;
+    }
+
+    .villa-img-wrap {
+      position: relative;
+    }
+    .villa-img-wrap::after {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      right: -24px;
+      bottom: -24px;
+      border: 1px solid var(--border);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .villa-img-wrap img {
+      width: 100%;
+      height: 580px;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+      filter: brightness(.88) saturate(.9);
+    }
+
+    .villa-text-col { padding-left: 16px; }
+    .villa-text-col .s-title { margin-bottom: 36px; }
+    .villa-text-col p {
+      font-size: 15px;
+      line-height: 2;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .villa-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      margin-top: 52px;
+      padding-top: 52px;
+      border-top: 1px solid var(--border);
+    }
+    .villa-stat {
+      padding: 0 24px;
+      border-right: 1px solid var(--border);
+    }
+    .villa-stat:first-child { padding-left: 0; }
+    .villa-stat:last-child { border-right: none; }
+    .villa-stat .num {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 52px;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+      display: block;
+    }
+    .villa-stat .lbl {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: block;
+    }
+
+    /* ============================================================
+       SERVICES SECTION
+    ============================================================ */
+    #services { background: var(--surface); }
+
+    .services-head { text-align: center; margin-bottom: 72px; }
+    .services-head .ornament { justify-content: center; }
+    .services-head .ornament-line { max-width: 80px; }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+    }
+    .svc-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 52px 24px 44px;
+      text-align: center;
+      transition: all .4s ease;
+      cursor: default;
+    }
+    .svc-card:hover {
+      background: var(--wood-mid);
+      border-color: var(--gold-dim);
+      transform: translateY(-4px);
+    }
+    .svc-icon {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 18px;
+      line-height: 1;
+    }
+    .svc-name {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      line-height: 1.5;
+      transition: color .3s;
+    }
+    .svc-card:hover .svc-name { color: var(--gold); }
+
+    /* ============================================================
+       PRICES SECTION
+    ============================================================ */
+    #prices { background: var(--bg); }
+
+    .prices-head { text-align: center; margin-bottom: 72px; }
+    .prices-head .ornament { justify-content: center; }
+    .prices-head .ornament-line { max-width: 80px; }
+
+    .prices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .price-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 64px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform .4s, border-color .4s;
+    }
+    .price-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold-dim);
+      transition: background .4s;
+    }
+    .price-card:hover { transform: translateY(-6px); border-color: var(--border-mid); }
+    .price-card:hover::before { background: var(--gold); }
+
+    .price-card.peak {
+      background: linear-gradient(160deg, var(--wood-mid) 0%, var(--wood) 100%);
+      border-color: var(--gold-dim);
+    }
+    .price-card.peak::before { background: var(--gold); }
+
+    .price-badge {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--gold);
+      padding: 4px 10px;
+    }
+
+    .price-season {
+      font-size: 9px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .price-months {
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 44px;
+    }
+    .price-num {
+      font-family: 'Cormorant Garant', serif;
+      line-height: 1;
+      color: var(--text);
+    }
+    .price-num .curr {
+      font-size: 28px;
+      vertical-align: top;
+      margin-top: 12px;
+      display: inline-block;
+      color: var(--gold);
+    }
+    .price-num .val { font-size: 96px; font-weight: 300; }
+    .price-per {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 16px;
+    }
+    .price-book-link {
+      display: block;
+      margin-top: 44px;
+      border: 1px solid var(--border-mid);
+      padding: 14px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      transition: all .3s;
+    }
+    .price-book-link:hover {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+    }
+
+    /* ============================================================
+       GALLERY
+    ============================================================ */
+    #gallery { background: var(--surface); }
+    .gallery-head { text-align: center; margin-bottom: 72px; }
+    .gallery-head .ornament { justify-content: center; }
+    .gallery-head .ornament-line { max-width: 80px; }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 260px;
+      gap: 4px;
+    }
+
+    .g-item.g-tall { grid-row: span 2; }
+    .g-item.g-wide { grid-column: span 2; }
+
+    .g-item {
+      overflow: hidden;
+      position: relative;
+      background: var(--surface-2);
+    }
+    .g-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(.82) saturate(.85);
+      transition: transform .9s ease, filter .6s ease;
+    }
+    .g-item:hover img { transform: scale(1.07); filter: brightness(1) saturate(1.05); }
+
+    .g-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 20px 18px 14px;
+      background: linear-gradient(to top, rgba(7,7,7,0.85) 0%, transparent 100%);
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .4s, transform .4s;
+    }
+    .g-item:hover .g-label { opacity: 1; transform: translateY(0); }
+
+    /* ============================================================
+       CONTACT
+    ============================================================ */
+    #contact { background: var(--bg); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .contact-col .s-title { margin-bottom: 28px; }
+    .contact-col > p {
+      font-size: 15px;
+      line-height: 2;
+      color: var(--text-muted);
+      margin-bottom: 52px;
+    }
+
+    .contact-block { margin-bottom: 36px; }
+    .contact-block-label {
+      font-size: 9px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .contact-phone-num {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 52px;
+      font-weight: 300;
+      color: var(--text);
+      letter-spacing: 2px;
+      display: inline-block;
+      transition: color .3s;
+    }
+    .contact-phone-num:hover { color: var(--gold); }
+
+    .contact-address {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--text-muted);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    .contact-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .ct-badge {
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ct-directions-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--border-mid);
+      padding: 13px 28px;
+      transition: all .3s;
+    }
+    .ct-directions-btn:hover {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+    }
+
+    .contact-right {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .contact-map-wrap {
+      position: relative;
+      height: 380px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .contact-map-wrap iframe {
+      width: 100%;
+      height: 100%;
+      filter: grayscale(40%) contrast(1.05) brightness(0.85);
+      transition: filter .4s;
+    }
+    .contact-map-wrap:hover iframe { filter: grayscale(0%) brightness(1); }
+
+    .map-pin-label {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(7,7,7,0.88);
+      border: 1px solid var(--border-mid);
+      padding: 8px 16px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .map-pin-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,169,110,0.25);
+      animation: pinPulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pinPulse {
+      0%,100%{ box-shadow: 0 0 0 3px rgba(201,169,110,0.25); }
+      50%{ box-shadow: 0 0 0 7px rgba(201,169,110,0.08); }
+    }
+
+    .contact-photo-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      height: 160px;
+    }
+    .contact-photo-strip img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(.75) saturate(.85);
+      transition: filter .4s;
+    }
+    .contact-photo-strip img:hover { filter: brightness(1) saturate(1); }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 44px 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .footer-copy {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+    }
+    .footer-loc {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 1100px) {
+      .container { padding: 0 40px; }
+      #nav { padding: 24px 40px; }
+      #nav.scrolled { padding: 14px 40px; }
+      .nav-center { display: none; }
+      .nav-cta { display: none; }
+      .hamburger { display: flex; }
+
+      .villa-grid { grid-template-columns: 1fr; gap: 56px; }
+      .villa-img-wrap::after { display: none; }
+      .villa-img-wrap img { height: 420px; }
+      .villa-text-col { padding-left: 0; }
+      .villa-stats { grid-template-columns: repeat(3, 1fr); }
+
+      .services-grid { grid-template-columns: repeat(3, 1fr); }
+
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-auto-rows: 220px;
+      }
+      .g-item.g-tall { grid-row: span 1; }
+      .g-item.g-wide { grid-column: span 2; }
+
+      .contact-grid { grid-template-columns: 1fr; gap: 56px; }
+      .contact-map-wrap { height: 300px; }
+      .contact-photo-strip { height: 130px; }
+
+      footer { flex-direction: column; gap: 16px; text-align: center; padding: 40px; }
+    }
+
+    @media (max-width: 700px) {
+      .container { padding: 0 20px; }
+      #nav { padding: 18px 20px; }
+      #nav.scrolled { padding: 12px 20px; }
+      .section-pad { padding: 80px 0; }
+
+      .hero-h1 { font-size: clamp(56px, 18vw, 96px); letter-spacing: -1px; }
+      .hero-actions { gap: 14px; }
+      .btn-gold, .btn-ghost { padding: 14px 36px; font-size: 9px; }
+
+      .villa-img-wrap img { height: 280px; }
+      .villa-stats { grid-template-columns: 1fr 1fr; }
+      .villa-stat:nth-child(2) { border-right: none; }
+      .villa-stat:last-child { grid-column: span 2; border-top: 1px solid var(--border); padding-top: 24px; margin-top: 8px; border-right: none; }
+
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .prices-grid { grid-template-columns: 1fr; max-width: 380px; }
+
+      .gallery-grid { grid-template-columns: 1fr; grid-auto-rows: 220px; }
+      .g-item.g-wide { grid-column: span 1; }
+
+      .contact-phone-num { font-size: 40px; }
+      .contact-map-wrap { height: 260px; }
+      .contact-photo-strip { height: 110px; }
+
+      footer { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =================== NAV =================== -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">Villa <span>Harmony</span></a>
+  <ul class="nav-center">
+    <li><a href="#villa" data-i18n="nav_villa">ვილა</a></li>
+    <li><a href="#services" data-i18n="nav_services">სერვისები</a></li>
+    <li><a href="#prices" data-i18n="nav_prices">ფასები</a></li>
+    <li><a href="#gallery" data-i18n="nav_gallery">გალერეა</a></li>
+    <li><a href="#contact" data-i18n="nav_contact">კონტაქტი</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-group">
+      <button class="lang-btn active" data-lang="ka">KA</button>
+      <span class="lang-sep">/</span>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <span class="lang-sep">/</span>
+      <button class="lang-btn" data-lang="ru">RU</button>
+    </div>
+    <a href="tel:514640220" class="nav-cta" data-i18n="nav_book">დაჯავშნე</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- =================== MOBILE DRAWER =================== -->
+<div id="mobile-drawer">
+  <a href="#villa" class="drawer-link" data-i18n="nav_villa">ვილა</a>
+  <a href="#services" class="drawer-link" data-i18n="nav_services">სერვისები</a>
+  <a href="#prices" class="drawer-link" data-i18n="nav_prices">ფასები</a>
+  <a href="#gallery" class="drawer-link" data-i18n="nav_gallery">გალერეა</a>
+  <a href="#contact" class="drawer-link" data-i18n="nav_contact">კონტაქტი</a>
+  <a href="tel:514640220" class="mobile-phone">514 640 220</a>
+  <div class="mobile-lang lang-group">
+    <button class="lang-btn" data-lang="ka">KA</button>
+    <span class="lang-sep">/</span>
+    <button class="lang-btn" data-lang="en">EN</button>
+    <span class="lang-sep">/</span>
+    <button class="lang-btn" data-lang="ru">RU</button>
+  </div>
+</div>
+
+<!-- =================== HERO =================== -->
+<section id="hero">
+  <canvas id="canvas-bg"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-body">
+    <div class="hero-tag" data-i18n="hero_location">ჩაქვი · საქართველო</div>
+    <h1 class="hero-h1">Villa<br><em>Harmony</em></h1>
+    <p class="hero-sub" data-i18n="hero_tagline">სიმშვიდე · სიდიადე · სილამაზე</p>
+    <div class="hero-actions">
+      <a href="tel:514640220" class="btn-gold" data-i18n="hero_book">დაჯავშნე ახლავე</a>
+      <a href="#villa" class="btn-ghost" data-i18n="hero_discover">გაიცანი ვილა</a>
+    </div>
+  </div>
+  <div class="hero-scroll-ind" id="scrollInd">
+    <div class="si-line"></div>
+    <span class="si-text" data-i18n="hero_scroll">scroll</span>
+  </div>
+</section>
+
+<!-- =================== VILLA =================== -->
+<section id="villa" class="section-pad">
+  <div class="container">
+    <div class="villa-grid">
+      <div class="villa-img-wrap rv-left">
+        <img src="MAFK1916.JPG" alt="Villa Harmony — ინტერიერი" loading="lazy">
+      </div>
+      <div class="villa-text-col rv-right">
+        <span class="s-label" data-i18n="villa_label">ვილა</span>
+        <h2 class="s-title" data-i18n-html="villa_title">სრული <em>სიმშვიდის</em> სივრცე</h2>
+        <p data-i18n="villa_p1">Villa Harmony განლაგებულია ჩაქვის ულამაზეს კუთხეში — ბუნებით გარშემორტყმულ ადგილას, სადაც კომფორტი და სიმშვიდე ორგანულად ერწყმის ერთმანეთს.</p>
+        <p data-i18n="villa_p2">ვილა სრულ სივრცეს გთავაზობთ — კერძო ბასეინი, სახურავის ტერასა, ბუნებრივი ეზო და სრული კომფორტი. ყველაფერი ერთ ადგილას.</p>
+        <div class="villa-stats">
+          <div class="villa-stat">
+            <span class="num">1</span>
+            <span class="lbl" data-i18n="stat1">კერძო ვილა</span>
+          </div>
+          <div class="villa-stat">
+            <span class="num">3</span>
+            <span class="lbl" data-i18n="stat2">სართული</span>
+          </div>
+          <div class="villa-stat">
+            <span class="num">∞</span>
+            <span class="lbl" data-i18n="stat3">კომფორტი</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== SERVICES =================== -->
+<section id="services" class="section-pad">
+  <div class="container">
+    <div class="services-head rv">
+      <span class="s-label" data-i18n="svc_label">სერვისები</span>
+      <h2 class="s-title" data-i18n-html="svc_title">ყველა <em>კომფორტი</em></h2>
+      <div class="ornament" style="justify-content:center;">
+        <div class="ornament-line" style="max-width:80px;"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line" style="max-width:80px;"></div>
+      </div>
+    </div>
+    <div class="services-grid">
+      <div class="svc-card rv"><span class="svc-icon">🏊</span><span class="svc-name" data-i18n="svc1">კერძო ბასეინი</span></div>
+      <div class="svc-card rv"><span class="svc-icon">🌿</span><span class="svc-name" data-i18n="svc2">კერძო ეზო</span></div>
+      <div class="svc-card rv"><span class="svc-icon">🍳</span><span class="svc-name" data-i18n="svc3">სრული სამზარეულო</span></div>
+      <div class="svc-card rv"><span class="svc-icon">🔥</span><span class="svc-name" data-i18n="svc4">BBQ / მანგალი</span></div>
+      <div class="svc-card rv"><span class="svc-icon">❄️</span><span class="svc-name" data-i18n="svc5">კონდიციონერი</span></div>
+      <div class="svc-card rv"><span class="svc-icon">🌡️</span><span class="svc-name" data-i18n="svc6">გათბობა</span></div>
+      <div class="svc-card rv"><span class="svc-icon">📶</span><span class="svc-name" data-i18n="svc7">WiFi</span></div>
+      <div class="svc-card rv"><span class="svc-icon">🏠</span><span class="svc-name" data-i18n="svc8">სახურავის ტერასა</span></div>
+      <div class="svc-card rv"><span class="svc-icon">🚗</span><span class="svc-name" data-i18n="svc9">გარე პარკინგი</span></div>
+      <div class="svc-card rv"><span class="svc-icon">🌅</span><span class="svc-name" data-i18n="svc10">ტერასა / ბალკონი</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== PRICES =================== -->
+<section id="prices" class="section-pad">
+  <div class="container">
+    <div class="prices-head rv">
+      <span class="s-label" data-i18n="pr_label">ფასები</span>
+      <h2 class="s-title" data-i18n-html="pr_title">ღამის <em>ღირებულება</em></h2>
+      <div class="ornament" style="justify-content:center;">
+        <div class="ornament-line" style="max-width:80px;"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line" style="max-width:80px;"></div>
+      </div>
+    </div>
+    <div class="prices-grid">
+      <div class="price-card peak rv">
+        <span class="price-badge" data-i18n="pr_peak_badge">პიკი</span>
+        <p class="price-season" data-i18n="pr_summer">ზაფხული</p>
+        <p class="price-months" data-i18n="pr_summer_m">ივნისი — ივლისი — აგვისტო</p>
+        <div class="price-num">
+          <span class="curr">₾</span><span class="val">500</span>
+        </div>
+        <p class="price-per" data-i18n="pr_per">ღამეში</p>
+        <a href="tel:514640220" class="price-book-link" data-i18n="pr_book">დაჯავშნე</a>
+      </div>
+      <div class="price-card rv">
+        <p class="price-season" data-i18n="pr_off">სხვა სეზონი</p>
+        <p class="price-months" data-i18n="pr_off_m">სექტემბერი — მაისი</p>
+        <div class="price-num">
+          <span class="curr">₾</span><span class="val">400</span>
+        </div>
+        <p class="price-per" data-i18n="pr_per">ღამეში</p>
+        <a href="tel:514640220" class="price-book-link" data-i18n="pr_book">დაჯავშნე</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== GALLERY =================== -->
+<section id="gallery" class="section-pad">
+  <div class="container">
+    <div class="gallery-head rv">
+      <span class="s-label" data-i18n="gal_label">გალერეა</span>
+      <h2 class="s-title" data-i18n-html="gal_title"><em>ვილის</em> სილამაზე</h2>
+      <div class="ornament" style="justify-content:center;">
+        <div class="ornament-line" style="max-width:80px;"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line" style="max-width:80px;"></div>
+      </div>
+    </div>
+    <div class="gallery-grid rv">
+      <div class="g-item g-tall">
+        <img src="QKVH7986.JPG" alt="Villa Harmony — ფასადი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_exterior">ფასადი</div>
+      </div>
+      <div class="g-item">
+        <img src="BEXL4323.JPG" alt="კერძო ბასეინი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_pool">კერძო ბასეინი</div>
+      </div>
+      <div class="g-item">
+        <img src="CEJO5561.JPG" alt="სახურავის ტერასა" loading="lazy">
+        <div class="g-label" data-i18n="glbl_terrace">სახურავის ტერასა</div>
+      </div>
+      <div class="g-item">
+        <img src="JMYX5725.JPG" alt="ეზო — ბასეინი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_garden">ეზო</div>
+      </div>
+      <div class="g-item">
+        <img src="GFJZ9353.JPG" alt="ტერასა — საღამო" loading="lazy">
+        <div class="g-label" data-i18n="glbl_sunset">ტერასა · საღამო</div>
+      </div>
+      <div class="g-item">
+        <img src="MAFK1916.JPG" alt="სასტუმრო ოთახი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_living">სასტუმრო ოთახი</div>
+      </div>
+      <div class="g-item">
+        <img src="EUXG6866.JPG" alt="სასტუმრო ოთახი 2" loading="lazy">
+        <div class="g-label" data-i18n="glbl_living2">სასტუმრო ოთახი</div>
+      </div>
+      <div class="g-item g-wide">
+        <img src="AMKE5358.JPG" alt="გამაგრილებელი ოთახი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_cave">სარდაფი · გართობის სივრცე</div>
+      </div>
+      <div class="g-item">
+        <img src="FIFB2676.JPG" alt="ბაღის ჩანჩქერი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_waterfall">ბაღის ჩანჩქერი</div>
+      </div>
+      <div class="g-item">
+        <img src="AYDA4897.JPG" alt="საძინებელი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_bed">საძინებელი</div>
+      </div>
+      <div class="g-item">
+        <img src="ISGL4389.JPG" alt="საძინებელი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_bed">საძინებელი</div>
+      </div>
+      <div class="g-item">
+        <img src="VEHK5496.JPG" alt="საძინებელი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_bed">საძინებელი</div>
+      </div>
+      <div class="g-item">
+        <img src="OMGT7167.JPG" alt="საძინებელი — ტვინი" loading="lazy">
+        <div class="g-label" data-i18n="glbl_twin">საძინებელი · twin</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== CONTACT =================== -->
+<section id="contact" class="section-pad">
+  <div class="container">
+    <div class="contact-grid">
+
+      <div class="contact-col rv-left">
+        <span class="s-label" data-i18n="ct_label">კონტაქტი</span>
+        <h2 class="s-title" data-i18n-html="ct_title">დაგვიკავშირდით <em>ახლავე</em></h2>
+        <p data-i18n="ct_desc">დაჯავშნეთ Villa Harmony და ისარგებლეთ განსაკუთრებული გამოცდილებით ჩაქვის გულში. ჩვენ მზად ვართ ყველა კითხვაზე გიპასუხოთ.</p>
+
+        <div class="contact-block">
+          <span class="contact-block-label" data-i18n="ct_phone_lbl">სატელეფონო ჯავშანი</span>
+          <a href="tel:514640220" class="contact-phone-num">514 640 220</a>
+        </div>
+
+        <div class="contact-block">
+          <span class="contact-block-label" data-i18n="ct_addr_lbl">მისამართი</span>
+          <p class="contact-address" data-i18n="ct_addr">ჩაქვი, ბათუმი — ობჩა გზატკეცილი,<br>აჭარის ა.რ., საქართველო</p>
+        </div>
+
+        <div class="contact-block">
+          <span class="contact-block-label" data-i18n="ct_loc_lbl">მდებარეობა</span>
+          <div class="contact-badges">
+            <span class="ct-badge">🌊 <span data-i18n="ct_sea">შავი ზღვა — 5 წთ</span></span>
+            <span class="ct-badge">✈️ <span data-i18n="ct_airport">ბათუმი — 12 კმ</span></span>
+          </div>
+        </div>
+
+        <a href="https://maps.google.com/?q=Tsereteli+3,+Chakvi,+Kobuleti,+Georgia" target="_blank" rel="noopener" class="ct-directions-btn">
+          <span>↗</span> <span data-i18n="ct_directions">მარშრუტის გაკვლევა</span>
+        </a>
+      </div>
+
+      <div class="contact-right rv-right">
+        <div class="contact-map-wrap">
+          <iframe
+            src="https://maps.google.com/maps?q=Tsereteli+3,+Chakvi,+Kobuleti,+Georgia&t=&z=16&ie=UTF8&iwloc=&output=embed"
+            width="100%"
+            height="100%"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            title="Villa Harmony — Chakvi, Georgia">
+          </iframe>
+          <div class="map-pin-label">
+            <span class="map-pin-dot"></span>
+            Villa Harmony · ჩაქვი
+          </div>
+        </div>
+        <div class="contact-photo-strip">
+          <img src="GFJZ9353.JPG" alt="ვილა · საღამო" loading="lazy">
+          <img src="CEJO5561.JPG" alt="ვილა · ტერასა" loading="lazy">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =================== FOOTER =================== -->
+<footer>
+  <div class="footer-logo">Villa Harmony</div>
+  <p class="footer-copy">© 2025 Villa Harmony · <span data-i18n="footer_rights">ყველა უფლება დაცულია</span></p>
+  <p class="footer-loc">Chakvi · Georgia</p>
+</footer>
+
+
+<!-- =================== JAVASCRIPT =================== -->
+<script>
+/* ============================================================
+   i18n
+============================================================ */
+const T = {
+  ka: {
+    nav_villa:"ვილა", nav_services:"სერვისები", nav_prices:"ფასები",
+    nav_gallery:"გალერეა", nav_contact:"კონტაქტი", nav_book:"დაჯავშნე",
+    hero_location:"ჩაქვი · საქართველო",
+    hero_tagline:"სიმშვიდე · სიდიადე · სილამაზე",
+    hero_book:"დაჯავშნე ახლავე", hero_discover:"გაიცანი ვილა", hero_scroll:"scroll",
+    villa_label:"ვილა",
+    villa_title:'სრული <em>სიმშვიდის</em> სივრცე',
+    villa_p1:"Villa Harmony განლაგებულია ჩაქვის ულამაზეს კუთხეში — ბუნებით გარშემორტყმულ ადგილას, სადაც კომფორტი და სიმშვიდე ორგანულად ერწყმის ერთმანეთს.",
+    villa_p2:"ვილა სრულ სივრცეს გთავაზობთ — კერძო ბასეინი, სახურავის ტერასა, ბუნებრივი ეზო და სრული კომფორტი. ყველაფერი ერთ ადგილას.",
+    stat1:"კერძო ვილა", stat2:"სართული", stat3:"კომფორტი",
+    svc_label:"სერვისები", svc_title:'ყველა <em>კომფორტი</em>',
+    svc1:"კერძო ბასეინი", svc2:"კერძო ეზო", svc3:"სრული სამზარეულო",
+    svc4:"BBQ / მანგალი", svc5:"კონდიციონერი", svc6:"გათბობა",
+    svc7:"WiFi", svc8:"სახურავის ტერასა", svc9:"გარე პარკინგი", svc10:"ტერასა / ბალკონი",
+    pr_label:"ფასები", pr_title:'ღამის <em>ღირებულება</em>',
+    pr_peak_badge:"პიკი", pr_summer:"ზაფხული",
+    pr_summer_m:"ივნისი — ივლისი — აგვისტო",
+    pr_off:"სხვა სეზონი", pr_off_m:"სექტემბერი — მაისი",
+    pr_per:"ღამეში", pr_book:"დაჯავშნე",
+    gal_label:"გალერეა", gal_title:'<em>ვილის</em> სილამაზე', gal_soon:"მალე",
+    glbl_exterior:"ფასადი", glbl_pool:"კერძო ბასეინი", glbl_terrace:"სახურავის ტერასა",
+    glbl_garden:"ეზო", glbl_sunset:"ტერასა · საღამო", glbl_living:"სასტუმრო ოთახი",
+    glbl_living2:"სასტუმრო ოთახი", glbl_cave:"სარდაფი · გართობის სივრცე",
+    glbl_waterfall:"ბაღის ჩანჩქერი", glbl_bed:"საძინებელი", glbl_twin:"საძინებელი · twin",
+    ct_label:"კონტაქტი", ct_title:'დაგვიკავშირდით <em>ახლავე</em>',
+    ct_desc:"დაჯავშნეთ Villa Harmony და ისარგებლეთ განსაკუთრებული გამოცდილებით ჩაქვის გულში. ჩვენ მზად ვართ ყველა კითხვაზე გიპასუხოთ.",
+    ct_phone_lbl:"სატელეფონო ჯავშანი", ct_loc_lbl:"მდებარეობა",
+    ct_addr_lbl:"მისამართი", ct_addr:"წერეთლის ქ. №3, ჩაქვი,<br>ქობულეთი, საქართველო",
+    ct_sea:"შავი ზღვა — 5 წთ", ct_airport:"ბათუმი — 12 კმ",
+    ct_directions:"მარშრუტის გაკვლევა",
+    footer_rights:"ყველა უფლება დაცულია"
+  },
+  en: {
+    nav_villa:"Villa", nav_services:"Services", nav_prices:"Prices",
+    nav_gallery:"Gallery", nav_contact:"Contact", nav_book:"Book Now",
+    hero_location:"Chakvi · Georgia",
+    hero_tagline:"Serenity · Grandeur · Beauty",
+    hero_book:"Book Now", hero_discover:"Discover the Villa", hero_scroll:"scroll",
+    villa_label:"The Villa",
+    villa_title:'A Space of Total <em>Serenity</em>',
+    villa_p1:"Villa Harmony is nestled in the breathtaking landscape of Chakvi — a nature-embraced haven where comfort and tranquility blend seamlessly in one exquisite space.",
+    villa_p2:"The villa offers everything for a perfect retreat — a private pool, rooftop terrace, lush garden and complete modern comfort. All in one place.",
+    stat1:"Private Villa", stat2:"Floors", stat3:"Comfort",
+    svc_label:"Services", svc_title:'Every <em>Comfort</em>',
+    svc1:"Private Pool", svc2:"Private Garden", svc3:"Full Kitchen",
+    svc4:"BBQ", svc5:"Air Conditioning", svc6:"Heating",
+    svc7:"WiFi", svc8:"Rooftop Terrace", svc9:"Outdoor Parking", svc10:"Terrace / Balcony",
+    pr_label:"Pricing", pr_title:'Nightly <em>Rate</em>',
+    pr_peak_badge:"Peak", pr_summer:"Summer",
+    pr_summer_m:"June — July — August",
+    pr_off:"Off Season", pr_off_m:"September — May",
+    pr_per:"per night", pr_book:"Book Now",
+    gal_label:"Gallery", gal_title:'<em>Villa</em> Beauty', gal_soon:"Coming Soon",
+    glbl_exterior:"Exterior", glbl_pool:"Private Pool", glbl_terrace:"Rooftop Terrace",
+    glbl_garden:"Garden", glbl_sunset:"Terrace · Evening", glbl_living:"Living Room",
+    glbl_living2:"Living Room", glbl_cave:"Basement · Entertainment Space",
+    glbl_waterfall:"Garden Waterfall", glbl_bed:"Bedroom", glbl_twin:"Bedroom · Twin",
+    ct_label:"Contact", ct_title:'Get in Touch <em>Now</em>',
+    ct_desc:"Book Villa Harmony and enjoy an exceptional experience in the heart of Chakvi. We are ready to answer any of your questions.",
+    ct_phone_lbl:"Book by Phone", ct_loc_lbl:"Location",
+    ct_addr_lbl:"Address", ct_addr:"Tsereteli St. №3, Chakvi,<br>Kobuleti, Georgia",
+    ct_sea:"Black Sea — 5 min", ct_airport:"Batumi — 12 km",
+    ct_directions:"Get Directions",
+    footer_rights:"All rights reserved"
+  },
+  ru: {
+    nav_villa:"Вилла", nav_services:"Услуги", nav_prices:"Цены",
+    nav_gallery:"Галерея", nav_contact:"Контакт", nav_book:"Забронировать",
+    hero_location:"Чакви · Грузия",
+    hero_tagline:"Покой · Величие · Красота",
+    hero_book:"Забронировать", hero_discover:"Узнать о вилле", hero_scroll:"scroll",
+    villa_label:"Вилла",
+    villa_title:'Пространство полного <em>покоя</em>',
+    villa_p1:"Villa Harmony расположена в живописном Чакви — месте, окружённом природой, где комфорт и спокойствие органично сочетаются в едином пространстве.",
+    villa_p2:"Вилла предлагает всё для идеального отдыха — частный бассейн, террасу на крыше, уютный сад и полный современный комфорт. Всё в одном месте.",
+    stat1:"Частная вилла", stat2:"Этажа", stat3:"Комфорт",
+    svc_label:"Услуги", svc_title:'Весь <em>комфорт</em>',
+    svc1:"Частный бассейн", svc2:"Частный сад", svc3:"Полная кухня",
+    svc4:"Мангал / BBQ", svc5:"Кондиционер", svc6:"Отопление",
+    svc7:"WiFi", svc8:"Терраса на крыше", svc9:"Уличная парковка", svc10:"Терраса / Балкон",
+    pr_label:"Цены", pr_title:'Стоимость за <em>ночь</em>',
+    pr_peak_badge:"Пик", pr_summer:"Лето",
+    pr_summer_m:"Июнь — Июль — Август",
+    pr_off:"Другой сезон", pr_off_m:"Сентябрь — Май",
+    pr_per:"за ночь", pr_book:"Забронировать",
+    gal_label:"Галерея", gal_title:'<em>Красота</em> виллы', gal_soon:"Скоро",
+    glbl_exterior:"Фасад", glbl_pool:"Частный бассейн", glbl_terrace:"Терраса на крыше",
+    glbl_garden:"Сад", glbl_sunset:"Терраса · Вечер", glbl_living:"Гостиная",
+    glbl_living2:"Гостиная", glbl_cave:"Подвал · Зона отдыха",
+    glbl_waterfall:"Садовый водопад", glbl_bed:"Спальня", glbl_twin:"Спальня · Twin",
+    ct_label:"Контакт", ct_title:'Свяжитесь с нами <em>сейчас</em>',
+    ct_desc:"Забронируйте Villa Harmony и насладитесь уникальным опытом в сердце Чакви. Мы готовы ответить на все ваши вопросы.",
+    ct_phone_lbl:"Бронирование по телефону", ct_loc_lbl:"Местоположение",
+    ct_addr_lbl:"Адрес", ct_addr:"ул. Церетели №3, Чакви,<br>Кобулети, Грузия",
+    ct_sea:"Чёрное море — 5 мин", ct_airport:"Батуми — 12 км",
+    ct_directions:"Построить маршрут",
+    footer_rights:"Все права защищены"
+  }
+};
+
+let lang = 'ka';
+
+function applyLang(l) {
+  lang = l;
+  const t = T[l];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (t[k] !== undefined) {
+      if (t[k].includes('<')) el.innerHTML = t[k];
+      else el.textContent = t[k];
+    }
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const k = el.dataset.i18nHtml;
+    if (t[k] !== undefined) el.innerHTML = t[k];
+  });
+  document.documentElement.lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === l);
+  });
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+/* ============================================================
+   NAV scroll behavior
+============================================================ */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+/* ============================================================
+   MOBILE DRAWER
+============================================================ */
+const hamburger = document.getElementById('hamburger');
+const drawer    = document.getElementById('mobile-drawer');
+
+hamburger.addEventListener('click', () => {
+  const open = drawer.classList.toggle('open');
+  hamburger.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+});
+
+document.querySelectorAll('.drawer-link').forEach(a => {
+  a.addEventListener('click', () => {
+    drawer.classList.remove('open');
+    hamburger.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+});
+
+/* ============================================================
+   THREE.JS — atmospheric particle field
+============================================================ */
+(function initThree() {
+  const canvas   = document.getElementById('canvas-bg');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 6;
+
+  const isMobile = window.innerWidth < 768;
+  const COUNT    = isMobile ? 1200 : 2800;
+
+  const geo  = new THREE.BufferGeometry();
+  const pos  = new Float32Array(COUNT * 3);
+  const col  = new Float32Array(COUNT * 3);
+  const sz   = new Float32Array(COUNT);
+
+  const palette = [
+    new THREE.Color('#C9A96E'),
+    new THREE.Color('#C9A96E'),
+    new THREE.Color('#1A3A6E'),
+    new THREE.Color('#F2ECE3'),
+  ];
+
+  for (let i = 0; i < COUNT; i++) {
+    const r   = 8 + Math.random() * 6;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const th  = Math.random() * Math.PI * 2;
+    pos[i*3]   = r * Math.sin(phi) * Math.cos(th);
+    pos[i*3+1] = r * Math.sin(phi) * Math.sin(th);
+    pos[i*3+2] = r * Math.cos(phi);
+
+    sz[i] = Math.random() * 1.5 + 0.3;
+
+    const c = palette[Math.floor(Math.random() * palette.length)];
+    col[i*3]   = c.r;
+    col[i*3+1] = c.g;
+    col[i*3+2] = c.b;
+  }
+
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color',    new THREE.BufferAttribute(col, 3));
+  geo.setAttribute('size',     new THREE.BufferAttribute(sz,  1));
+
+  const mat = new THREE.PointsMaterial({
+    size:         0.045,
+    vertexColors: true,
+    transparent:  true,
+    opacity:      0.65,
+    sizeAttenuation: true,
+    blending:     THREE.AdditiveBlending,
+    depthWrite:   false,
+  });
+
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  let mx = 0, my = 0;
+  let tx = 0, ty = 0;
+  document.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth  - 0.5) * 0.4;
+    my = (e.clientY / window.innerHeight - 0.5) * 0.3;
+  }, { passive: true });
+
+  let scrollY = 0;
+  window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+  function tick() {
+    requestAnimationFrame(tick);
+    const t = Date.now() * 0.00008;
+
+    tx += (mx - tx) * 0.04;
+    ty += (my - ty) * 0.04;
+
+    points.rotation.y = t * 0.4 + tx * 0.6;
+    points.rotation.x = t * 0.15 - ty * 0.4;
+    points.position.y = scrollY * 0.002;
+
+    renderer.render(scene, camera);
+  }
+  tick();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }, { passive: true });
+})();
+
+/* ============================================================
+   GSAP ANIMATIONS
+============================================================ */
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero entrance sequence
+gsap.to('.hero-tag',     { opacity: 1, y: 0, duration: 1.2, delay: 0.3,  ease: 'power3.out' });
+gsap.to('.hero-h1',      { opacity: 1, y: 0, duration: 1.4, delay: 0.6,  ease: 'power3.out' });
+gsap.to('.hero-sub',     { opacity: 1, y: 0, duration: 1.2, delay: 1.0,  ease: 'power3.out' });
+gsap.to('.hero-actions', { opacity: 1, y: 0, duration: 1.2, delay: 1.3,  ease: 'power3.out' });
+gsap.to('#scrollInd',    { opacity: 1,        duration: 1.2, delay: 2.0,  ease: 'power2.out' });
+
+// Scroll-triggered reveals
+gsap.utils.toArray('.rv').forEach(el => {
+  gsap.to(el, {
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+    opacity: 1, y: 0, duration: 1.1, ease: 'power3.out'
+  });
+});
+
+gsap.utils.toArray('.rv-left').forEach(el => {
+  gsap.to(el, {
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+    opacity: 1, x: 0, duration: 1.1, ease: 'power3.out'
+  });
+});
+
+gsap.utils.toArray('.rv-right').forEach(el => {
+  gsap.to(el, {
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+    opacity: 1, x: 0, duration: 1.1, ease: 'power3.out'
+  });
+});
+</script>
+</body>
+</html>
